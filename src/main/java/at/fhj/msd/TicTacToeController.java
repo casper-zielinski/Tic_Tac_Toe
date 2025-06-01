@@ -232,53 +232,61 @@ public class TicTacToeController implements Initializable{
     }
 
     @FXML
-    void Checking_winner(ActionEvent event) {
-      Dialog<String> dialog = new Dialog<>();
+    void Checking_winner(ActionEvent event) throws InterruptedException{
 
-      if (Logic.Game_Won(UpdatedGrid()) && !Logic.NotAllowedChars(UpdatedGrid()))
-      {
-           Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle(getWinner() + " has won!!!");
-            alert.setHeaderText("Game Won");
-            alert.setContentText(getWinner() + " !\nYou have won the Game, do you want to play again?");
-            Optional<ButtonType> result = alert.showAndWait();
+      new Thread(()-> {
 
-            if (result.isPresent() && result.get() == ButtonType.OK)
-            {
-                  ClearTextBox();
-            }
+      try {
+                  while (true) { 
+                  if (Logic.Game_Won(UpdatedGrid()) && !Logic.NotAllowedChars(UpdatedGrid()))
+                  {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle(getWinner() + " has won!!!");
+                        alert.setHeaderText("Game Won");
+                        alert.setContentText(getWinner() + " !\nYou have won the Game, do you want to play again?");
+                        Optional<ButtonType> result = alert.showAndWait();
 
-      }
-      else if (Logic.NotAllowedChars(UpdatedGrid()))
-      {
-          Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("False Characters");
-            alert.setHeaderText(null);
-            alert.setContentText("You play TicTacToe, only use \"X\" and \"O\" ");
-            alert.showAndWait(); // blockiert bis Benutzer schließt
-      }
-      else if (Logic.Game_Tied(UpdatedGrid())) {
-          Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Game TIED");
-            alert.setHeaderText(null);
-            alert.setContentText("There is a tie between both parties, do you want to paly again?");
+                        if (result.isPresent() && result.get() == ButtonType.OK)
+                        {
+                              ClearTextBox();
+                        }
 
-            Optional<ButtonType> result = alert.showAndWait();
-           
-            if (result.isPresent() && result.get() == ButtonType.OK)
-            {
-                  ClearTextBox();
-            }
-            
-      }
-      else {
-          Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Game goes on");
-            alert.setHeaderText(null);
-            alert.setContentText("Nobody won, the Game goes on");
-            alert.showAndWait();
-      }
-      
+                  }      
+                  else if (Logic.Game_Tied(UpdatedGrid())) 
+                  {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Game TIED");
+                        alert.setHeaderText(null);
+                        alert.setContentText("There is a tie between both parties, do you want to paly again?");
+
+                        Optional<ButtonType> result = alert.showAndWait();
+                  
+                        if (result.isPresent() && result.get() == ButtonType.OK)
+                        {
+                              ClearTextBox();
+                        }
+                  
+                  }
+                  
+
+                  }
+
+      } catch (Exception e) { System.err.println("Something went wrong");}
+
+      }).start();
+
+
+
+     
+      // else if (Logic.NotAllowedChars(UpdatedGrid()))
+      // {
+      //     Alert alert = new Alert(Alert.AlertType.WARNING);
+      //       alert.setTitle("False Characters");
+      //       alert.setHeaderText(null);
+      //       alert.setContentText("You play TicTacToe, only use \"X\" and \"O\" ");
+      //       alert.showAndWait(); // blockiert bis Benutzer schließt
+      // }
+
     }
 
 
