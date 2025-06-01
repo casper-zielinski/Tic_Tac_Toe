@@ -2,6 +2,7 @@ package at.fhj.msd;
 
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import at.fhj.msd.Logic.Logic;
@@ -10,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
@@ -48,6 +50,9 @@ public class TicTacToeController implements Initializable{
     private Button btn_check;
 
     @FXML
+    private Button btn_reset;
+
+    @FXML
     private ChoiceBox<String> cb_mode;
 
     private String[] Mode = {"Player vs. Player", "Player vs Computer"};
@@ -63,7 +68,27 @@ public class TicTacToeController implements Initializable{
       };
                               
                               
+      private void ClearTextBox() {
+            
+            top_left.setText("");
+            top_middle.setText("");
+            top_right.setText("");
+
+            middle_left.setText("");
+            middle_middle.setText("");
+            middle_right.setText("");
+
+            bottom_left.setText("");
+            bottom_middle.setText("");
+            bottom_right.setText("");
+      }
+
       
+      @FXML
+      void Reset_tb(ActionEvent event) {
+            ClearTextBox();
+            Logic.clearArray(Grid);
+      }
 
       private String[][] UpdatedGrid()
       {
@@ -84,6 +109,17 @@ public class TicTacToeController implements Initializable{
 
  
     private int x_or_y  = 0;
+
+    private String getWinner()
+    {
+      if (x_or_y % 2 == 0)
+      {
+            return "O";
+      }
+      else{
+            return "X";
+      }
+    }
 
 
 
@@ -202,10 +238,15 @@ public class TicTacToeController implements Initializable{
       if (Logic.Game_Won(UpdatedGrid()) && !Logic.NotAllowedChars(UpdatedGrid()))
       {
            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("You have won!!!");
+            alert.setTitle(getWinner() + " has won!!!");
             alert.setHeaderText("Game Won");
-            alert.setContentText("You have won the Game, do you want to play again?");
-            alert.showAndWait();
+            alert.setContentText(getWinner() + " !\nYou have won the Game, do you want to play again?");
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK)
+            {
+                  ClearTextBox();
+            }
 
       }
       else if (Logic.NotAllowedChars(UpdatedGrid()))
@@ -215,6 +256,20 @@ public class TicTacToeController implements Initializable{
             alert.setHeaderText(null);
             alert.setContentText("You play TicTacToe, only use \"X\" and \"O\" ");
             alert.showAndWait(); // blockiert bis Benutzer schließt
+      }
+      else if (Logic.Game_Tied(UpdatedGrid())) {
+          Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Game TIED");
+            alert.setHeaderText(null);
+            alert.setContentText("There is a tie between both parties, do you want to paly again?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+           
+            if (result.isPresent() && result.get() == ButtonType.OK)
+            {
+                  ClearTextBox();
+            }
+            
       }
       else {
           Alert alert = new Alert(Alert.AlertType.INFORMATION);

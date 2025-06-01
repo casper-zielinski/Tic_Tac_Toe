@@ -7,11 +7,11 @@ import at.fhj.msd.Logic.Logic;
  */
 public class App {
     public static void main(String[] args) {
-        String[][] Grid = {{"","",""},
-                           {"","",""},
-                           {"","",""}};
+        String[][] Grid = {{"O","X","O"},
+                           {"X","O","O"},
+                           {"X","O","X"}};
 
-        System.out.println(Logic.Game_Won(Grid));  
+        System.out.println(Logic.Game_Tied(Grid));  
 
     }
 }

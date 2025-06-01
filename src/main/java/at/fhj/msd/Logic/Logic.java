@@ -13,6 +13,18 @@ public class Logic {
       public String[] Possible_Anwsers = {"X","O"};
       public static List<String> Checker = new ArrayList<>();
 
+      public static String[][] clearArray (String[][] Grid)
+      {
+            for (int i = 0; i < 3 ; i++)
+            {
+                  for (int j = 0; j < 3; j++)
+                  {
+                        Grid[i][j] = "";
+                  } 
+            }
+            return Grid;
+      }
+
 
       /**
        * Checks if unallowed Charackters exist, like: "Ü","?","Y" and so on
@@ -66,6 +78,11 @@ public class Logic {
       public static boolean Game_Won(String[][] Grid)
       {
           return (Rows_Same(Grid) || Colums_Same(Grid) || Dialoganly_Same(Grid));
+      }
+
+      public static boolean Game_Tied(String[][] Grid)
+      {
+            return OnlyX_O(Grid) && !Game_Won(Grid);
       }
 
       /**
