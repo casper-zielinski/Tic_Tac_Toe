@@ -1,7 +1,7 @@
 package at.fhj.msd;
 
+
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import at.fhj.msd.Logic.Logic;
@@ -10,10 +10,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 
-public class TicTacToeController {
+public class TicTacToeController implements Initializable{
 
     @FXML
     private TextField bottom_left;
@@ -45,6 +47,11 @@ public class TicTacToeController {
     @FXML
     private Button btn_check;
 
+    @FXML
+    private ChoiceBox<String> cb_mode;
+
+    private String[] Mode = {"Player vs. Player", "Player vs Computer"};
+
     private String safeText(TextField tf) {
     return tf != null ? tf.getText() : "";
     }
@@ -73,6 +80,119 @@ public class TicTacToeController {
     @FXML
     void next_round(ActionEvent event) {
 
+    }
+
+ 
+    private int x_or_y  = 0;
+
+
+
+    @FXML
+    void setX_or_O_1(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            top_left.setText("X");
+      }
+      else{
+            top_left.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_2(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            top_middle.setText("X");
+      }
+      else{
+            top_middle.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_3(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            top_right.setText("X");
+      }
+      else{
+            top_right.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_4(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            middle_left.setText("X");
+      }
+      else{
+            middle_left.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_5(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            middle_middle.setText("X");
+      }
+      else{
+            middle_middle.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_6(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            middle_right.setText("X");
+      }
+      else{
+            middle_right.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_7(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            bottom_left.setText("X");
+      }
+      else{
+            bottom_left.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_8(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            bottom_middle.setText("X");
+      }
+      else{
+            bottom_middle.setText("O");
+      }
+      x_or_y++;
+    }
+
+    @FXML
+    void setX_or_O_9(MouseEvent event) {
+      if (x_or_y % 2 == 0)
+      {
+            bottom_right.setText("X");
+      }
+      else{
+            bottom_right.setText("O");
+      }
+      x_or_y++;
     }
 
     @FXML
@@ -104,6 +224,12 @@ public class TicTacToeController {
             alert.showAndWait();
       }
       
+    }
+
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+      cb_mode.getItems().addAll(Mode);
     }
 
 

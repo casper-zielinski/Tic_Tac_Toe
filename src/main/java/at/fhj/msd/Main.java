@@ -1,5 +1,7 @@
 package at.fhj.msd;
 
+
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +15,7 @@ public class Main extends Application{
       public void start(Stage Stage) throws Exception {
             Parent root = FXMLLoader.load(getClass().getResource("/TicTacToe.fxml"));
             Scene scene = new Scene(root, Color.AQUAMARINE);
-            scene.getStylesheets().add(getClass().getResource("/style/style.css").toExternalForm());
+            scene.getStylesheets().add(getClass().getResource("/style/style.css").toExternalForm());            
             Stage.setScene(scene);
             Stage.setTitle("Tic Tac Toe");
             Stage.show();
