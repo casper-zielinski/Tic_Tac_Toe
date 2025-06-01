@@ -1,0 +1,28 @@
+{
+	"version": "0.2.0",
+      "configurations": [
+        {
+          "type": "java",
+          "name": "App",
+          "request": "launch",
+          "mainClass": "at.fhj.msd.App",
+          "projectName": "Tic_Tac_Toe"
+        },
+        {
+          "type": "java",
+          "name": "Main",
+          "request": "launch",
+          "mainClass": "at.fhj.msd.Main",
+          "projectName": "learn_by_doing"
+        },
+        {
+          "type": "java",
+          "name": "Launch JavaFX Main",
+          "request": "launch",
+          "mainClass": "Main",
+          "vmArgs": "--module-path lib --add-modules javafx.controls"
+        }
+      ]
+
+
+}

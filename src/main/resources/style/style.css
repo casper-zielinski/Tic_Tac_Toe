@@ -1,0 +1,9 @@
+TextField{
+      font-size:xx-large;
+      -fx-font-size: xx-large;
+}
+
+AnchorPane{
+      background-color: rgb(200, 242, 200);
+      -fx-background-color: rgb(200, 242, 200);
+}
