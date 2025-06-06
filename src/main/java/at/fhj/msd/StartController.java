@@ -43,24 +43,21 @@ public class StartController implements Initializable {
     private Button playerVsPlayerButton;
     private Button playerVsComputerButton;
 
-    public void Click_else_where(MouseEvent event) {
-      if (event.getEventType() == MouseEvent.MOUSE_CLICKED)
-      {
-            if (event.getTarget() != Option_Pane) {
-          btn_exit.setStyle("-fx-background-color: #9b1690;");//Reset button style
-          btn_start.setStyle("-fx-background-color: #9b1690;");
-          btn_rules.setStyle("-fx-background-color: #9b1690;");
-            } 
-      }
-      
-    }
 
+    /**
+     * Exit the application when the exit button is clicked.
+     * This method is called when the exit button is clicked.
+     * @param event
+     */
     @FXML
-    void Exit(ActionEvent event) {
+    void Exit(ActionEvent event) { 
       btn_start.setStyle("-fx-background-color: #9b1690;");//Reset button style
       btn_rules.setStyle("-fx-background-color: #9b1690;");
 
       btn_exit.setStyle("-fx-background-color: #580b52");
+      // Close the application
+      Stage stage = (Stage) btn_exit.getScene().getWindow();
+      stage.close();
     }
 
     public Optional<ButtonType> result; //Dialog result
@@ -68,6 +65,16 @@ public class StartController implements Initializable {
     private Scene scene; //Scene for the GAME
     private Parent root; //Root for the GAME
 
+    /**
+     * Start the game when the start button is clicked.
+     * This method is called when the start button is clicked.
+     * A dialog is shown to select the game mode (Player vs Player or Player vs Computer).
+     * The selected game mode is then used to load the appropriate game scene.
+     * The Start Scene is closed after the selection is made.
+     * If the user cancels the dialog, a message is printed to the console and the application remains on the start screen
+     * and the dialog is closed.
+     * @param event
+     */
     @FXML
     @SuppressWarnings("CallToPrintStackTrace")
     void Start_game(ActionEvent event) {
@@ -77,6 +84,10 @@ public class StartController implements Initializable {
       btn_start.setStyle("-fx-background-color: #580b52");
 
 
+      /**
+       * Initialize the dialog for game selection.
+       * The dialog allows the user to choose between Player vs Player and Player vs Computer modes.
+       */
       ButtonType playerVsPlayer = new ButtonType("Player vs Player");
       ButtonType playerVsComputer = new ButtonType("Player vs Computer");
 
@@ -97,10 +108,15 @@ public class StartController implements Initializable {
             System.out.println("Player vs Player selected");
             try {
               setPlayerVsXScene();
+              stage = (Stage) btn_start.getScene().getWindow(); // Get the current stage
+              stage.close(); // Close the current stage
             } catch (IOException e) {
               System.out.println("Error loading Player vs Player scene: " + e.getMessage());
               e.printStackTrace();
-            } // Call the method to set the Player vs Player scene
+            } 
+            catch (NullPointerException e) { // You need to handle this exception to avoid NullPointerException and many others, this is simply to keep the terminal clean
+                  System.out.println("Closed first Scene");
+            }
       } 
       else if (result.isPresent() && result.get() == playerVsComputer)
       {
@@ -108,28 +124,42 @@ public class StartController implements Initializable {
             System.out.println("Player vs Computer selected");
             try {
                   setPlayerVsXScene(); 
+                  stage = (Stage) btn_start.getScene().getWindow(); // Get the current stage
+                  stage.close(); // Close the current stage
             } catch (IOException e) {
                   System.out.println("Error loading Player vs Computer scene: " + e.getMessage());
                   e.printStackTrace();
             }
-            // Load the player vs computer game scene here
-            // For example, you can use FXMLLoader to load a new FXML file for the game
+            catch (NullPointerException e) { // You need to handle this exception to avoid NullPointerException and many others, this is simply to keep the terminal clean
+                  System.out.println("Closed first Scene");
+            }
       } 
       else {
-            System.out.println("Game selection cancelled");
+            System.out.println("Game selection cancelled"); // If the user cancels the dialog, print a message
       }
 
     }
 
+    /**
+     * Set the scene for Player vs X (either Player vs Player or Player vs Computer).
+     * This method loads the TicTacToe.fxml file and sets the scene for the game.
+     * @throws IOException if the FXML file cannot be loaded
+     */
     private void setPlayerVsXScene() throws IOException {
-     root = FXMLLoader.load(getClass().getResource("/TicTacToe.fxml"));
-     stage = (Stage) btn_start.getScene().getWindow(); // Get the current stage
-     scene = new Scene(root);
-     stage.setScene(scene);
-     stage.setTitle("Tic Tac Toe Game");
-     scene.getStylesheets().add(getClass().getResource("/style/style.css").toExternalForm());
+        root = FXMLLoader.load(getClass().getResource("/TicTacToe.fxml"));
+        stage = (Stage) btn_start.getScene().getWindow(); // Get the current stage
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setTitle("Tic Tac Toe Game");
+        scene.getStylesheets().add(getClass().getResource("/style/style.css").toExternalForm());
     }
 
+    /**
+     * Show the rules of the game when the rules button is clicked.
+     * This method is called when the rules button is clicked.
+     * It changes the style of the buttons to indicate that the rules button is active.
+     * @param event
+     */
     @FXML
     void show_Rules(ActionEvent event) {
       btn_exit.setStyle("-fx-background-color: #9b1690;");//Reset button style

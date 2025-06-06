@@ -16,6 +16,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 
 public class TicTacToeController implements Initializable{
 
@@ -52,22 +53,43 @@ public class TicTacToeController implements Initializable{
     @FXML
     private Button btn_reset;
 
+   @FXML
+    private Button btn_exit;
+
+    private Stage stage;
+
+    /**
+     * To Exit the application when the exit button is clicked.
+     * @param event
+     */
     @FXML
-    private ChoiceBox<String> cb_mode;
+    void Exit(ActionEvent event) {
+      stage = (Stage) btn_exit.getScene().getWindow();
+      stage.close();
+    }
 
-    private String[] Mode = {"Player vs. Player", "Player vs Computer"};
-
+    /**
+     * This method is used to safely get the text from a TextField.
+     * If the TextField is null, it returns an empty string.
+     * @param tf The TextField from which to get the text.
+     * @return The text from the TextField or an empty string if the TextField is null.
+     */
     private String safeText(TextField tf) {
     return tf != null ? tf.getText() : "";
     }
 
+    // Initialize the grid with the text from the TextFields
       private String[][] Grid = {
       { safeText(top_left), safeText(top_middle), safeText(top_right) },
       { safeText(middle_left), safeText(middle_middle), safeText(middle_right) },
       { safeText(bottom_left), safeText(bottom_middle), safeText(bottom_right) }
       };
                               
-                              
+   
+      /**
+       * This method clears the text in all TextFields.
+       * It sets the text of each TextField to an empty string.
+       */
       private void ClearTextBox() {
             
             top_left.setText("");
@@ -83,8 +105,13 @@ public class TicTacToeController implements Initializable{
             bottom_right.setText("");
       }
 
-      
+      /**
+       * This method resets the game by clearing the TextFields and the grid.
+       * It also displays an alert to inform the user that the game has been reset.
+       * It is called when the reset button is clicked.
+       */
       @FXML
+      @SuppressWarnings("CallToPrintStackTrace")
       void Reset_tb(ActionEvent event) {
             ClearTextBox();
             Logic.clearArray(Grid);
@@ -116,15 +143,19 @@ public class TicTacToeController implements Initializable{
       }
       
 
-    @FXML
-    void next_round(ActionEvent event) {
-      
-    }
 
- 
+
+ /**
+  * This variable keeps track of the current player/variable.
+  */
     private int x_or_y  = 0;
 
-    private String getWinner()
+    /**
+     * This method returns the current player based on the value of x_or_y.
+     * If x_or_y is even, it returns "O", otherwise it returns "X".
+     * @return The current player as a String ("O" or "X").
+     */
+    private String getCurrentPlayer() 
     {
       if (x_or_y % 2 == 0)
       {
@@ -137,6 +168,10 @@ public class TicTacToeController implements Initializable{
 
 
 
+    /**
+     * All those methods are used to set the text of the TextFields
+     * based on the current player (X or O).
+     */
     @FXML
     void setX_or_O_1(MouseEvent event) {
       if (x_or_y % 2 == 0)
@@ -245,6 +280,14 @@ public class TicTacToeController implements Initializable{
       x_or_y++;
     }
 
+
+    /**
+     * Note: This method is called to check if the game has been won or tied.
+     * It runs in a separate thread to avoid blocking the UI.
+     * Needs to be worked on to ensure it works correctly with the game logic.
+     * @param event
+     * @throws InterruptedException
+     */
     @FXML
     void Checking_winner(ActionEvent event) throws InterruptedException{
 
@@ -257,9 +300,9 @@ public class TicTacToeController implements Initializable{
                         {
                               Platform.runLater(() -> {
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                                    alert.setTitle(getWinner() + " has won!!!");
+                                    alert.setTitle(getCurrentPlayer() + " has won!!!");
                                     alert.setHeaderText("Game Won");
-                                    alert.setContentText(getWinner() + " !\nYou have won the Game, do you want to play again?");
+                                    alert.setContentText(getCurrentPlayer() + " !\nYou have won the Game, do you want to play again?");
                                     Optional<ButtonType> result = alert.showAndWait();
 
                                     if (result.isPresent() && result.get() == ButtonType.OK)
@@ -268,12 +311,7 @@ public class TicTacToeController implements Initializable{
                                           Logic.clearArray(Grid);
 
                                           
-                                          try {
-                                                Thread.sleep(150);
-                                          } catch (InterruptedException e) {
-                                                // TODO Auto-generated catch block
-                                                e.printStackTrace();
-                                          }
+                                          // Removed Thread.sleep(150); as it is not recommended in UI/game logic
                                           try {
                                                 Checking_winner(event);
                                           } catch (InterruptedException ex) {
@@ -283,10 +321,11 @@ public class TicTacToeController implements Initializable{
                                     }
                               });
                               break;
-                        }      
+                        }     
+
                         else if (Logic.Game_Tied(UpdatedGrid())) 
                         {
-                              Platform.runLater(() -> {
+                              
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                                     alert.setTitle("Game TIED");
                                     alert.setHeaderText(null);
@@ -298,12 +337,14 @@ public class TicTacToeController implements Initializable{
                                     {
                                           ClearTextBox();
                                           Logic.clearArray(Grid);
-                                          try {
-                                                Thread.sleep(150);
-                                          } catch (InterruptedException e) {
-                                                // TODO Auto-generated catch block
-                                                e.printStackTrace();
-                                          }
+
+                                          // try {
+                                          //       Thread.sleep(150);
+                                          // } catch (InterruptedException e) {
+                                          //       
+                                          //       e.printStackTrace();
+                                          // }
+
                                           try {
                                                 Checking_winner(event);
                                           } catch (InterruptedException ex) {
@@ -311,10 +352,12 @@ public class TicTacToeController implements Initializable{
                                                 // ex.printStackTrace();
                                           }
                                     }
-                              });
+                              
                               break;
                         }
+
                   }
+
             } catch (RuntimeException ex) {
                   System.err.println("RuntimeException occurred");
                   // ex.printStackTrace();
@@ -323,9 +366,17 @@ public class TicTacToeController implements Initializable{
     }
 
 
+    /**
+     * This method initializes the controller.
+     * It is called when the FXML file is loaded.
+     * It sets the TextFields to be non-editable
+     * to prevent users from manually changing the text.
+     * The Text is set by clicking on the TextFields, so the user can only interact with the game by clicking on them.
+     * There is no need for the user to edit the TextFields manually.
+     * That's why we set them to be non-editable.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-      cb_mode.getItems().addAll(Mode);
 
       bottom_left.setEditable(false);
       bottom_middle.setEditable(false);
@@ -339,9 +390,5 @@ public class TicTacToeController implements Initializable{
       top_middle.setEditable(false);
       top_right.setEditable(false);
     }
-
-
-
-
 
 }
