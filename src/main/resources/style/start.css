@@ -1,0 +1,44 @@
+Button{
+      -fx-background-color: #9b1690; /* Green */
+      -fx-text-fill: white; /* White text */
+      -fx-font-size: 16px; /* Font size */
+      -fx-padding: 5px; /* Padding around the text */
+      -fx-margin: 20px; /* Margin around the button */
+      -fx-border-radius: 20px; /* Rounded corners */
+}
+
+#Option_Pane{
+      -fx-background-color: #87cad4; /* Light gray background */
+      -fx-border-color: #9b1690; /* Border color matching the button */
+      -fx-border-width: 6px; /* Border width */
+      -fx-border-radius: 10px; /* Rounded corners for the pane */
+}
+
+AnchorPane{
+      -fx-background-color: #a5ccd2; /* Light gray background */
+      -fx-padding: 10px; /* Padding around the pane */
+}
+
+#btn_start:hover{
+      -fx-background-color: #7a0f6c; /* Darker shade on hover */
+      -fx-effect: dropshadow(gaussian, rgb(0,0,0,0.5), 9, 0.4, 2, 2); /* Shadow effect on hover */
+      -fx-cursor: hand; /* Change cursor to hand on hover */
+      -fx-scale-x: 1.05;
+      -fx-scale-y: 1.05;
+}
+
+#btn_exit:hover{
+      -fx-background-color: #7a0f6c; /* Darker shade on hover */
+      -fx-effect: dropshadow(gaussian, rgb(0,0,0,0.5), 9, 0.4, 2, 2); /* Shadow effect on hover */
+      -fx-cursor: hand; /* Change cursor to hand on hover */
+      -fx-scale-x: 1.05;
+      -fx-scale-y: 1.05;
+}
+
+#btn_rules:hover{
+      -fx-background-color: #7a0f6c; /* Darker shade on hover */
+      -fx-effect: dropshadow(gaussian, rgb(0,0,0,0.5), 9, 0.4, 2, 2); /* Shadow effect on hover */
+      -fx-cursor: hand; /* Change cursor to hand on hover */
+      -fx-scale-x: 1.05;
+      -fx-scale-y: 1.05;
+}

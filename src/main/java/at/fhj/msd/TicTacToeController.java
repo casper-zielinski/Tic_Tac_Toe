@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import at.fhj.msd.Logic.Logic;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,7 +14,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 
@@ -88,6 +88,20 @@ public class TicTacToeController implements Initializable{
       void Reset_tb(ActionEvent event) {
             ClearTextBox();
             Logic.clearArray(Grid);
+            Platform.runLater(() -> {
+                  Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                  alert.setTitle("Reset");
+                  alert.setHeaderText(null);
+                  alert.setContentText("The Game has been reset!");
+                  alert.showAndWait();
+                  try {
+                        Checking_winner(event);
+                  } catch (InterruptedException e) {
+                       new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner.").showAndWait();
+                        e.printStackTrace();
+                  }
+            });
+            
       }
 
       private String[][] UpdatedGrid()
@@ -104,7 +118,7 @@ public class TicTacToeController implements Initializable{
 
     @FXML
     void next_round(ActionEvent event) {
-
+      
     }
 
  
@@ -234,65 +248,96 @@ public class TicTacToeController implements Initializable{
     @FXML
     void Checking_winner(ActionEvent event) throws InterruptedException{
 
-      new Thread(()-> {
-
-      try {
+      new Thread(() -> {
+            try {
+                  // Check if the game is won or tied
+                  // and display an alert accordingly
                   while (true) { 
-                  if (Logic.Game_Won(UpdatedGrid()) && !Logic.NotAllowedChars(UpdatedGrid()))
-                  {
-                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                        alert.setTitle(getWinner() + " has won!!!");
-                        alert.setHeaderText("Game Won");
-                        alert.setContentText(getWinner() + " !\nYou have won the Game, do you want to play again?");
-                        Optional<ButtonType> result = alert.showAndWait();
-
-                        if (result.isPresent() && result.get() == ButtonType.OK)
+                        if (Logic.Game_Won(UpdatedGrid()) && !Logic.NotAllowedChars(UpdatedGrid()))
                         {
-                              ClearTextBox();
-                        }
+                              Platform.runLater(() -> {
+                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                                    alert.setTitle(getWinner() + " has won!!!");
+                                    alert.setHeaderText("Game Won");
+                                    alert.setContentText(getWinner() + " !\nYou have won the Game, do you want to play again?");
+                                    Optional<ButtonType> result = alert.showAndWait();
 
-                  }      
-                  else if (Logic.Game_Tied(UpdatedGrid())) 
-                  {
-                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                        alert.setTitle("Game TIED");
-                        alert.setHeaderText(null);
-                        alert.setContentText("There is a tie between both parties, do you want to paly again?");
+                                    if (result.isPresent() && result.get() == ButtonType.OK)
+                                    {
+                                          ClearTextBox();
+                                          Logic.clearArray(Grid);
 
-                        Optional<ButtonType> result = alert.showAndWait();
-                  
-                        if (result.isPresent() && result.get() == ButtonType.OK)
+                                          
+                                          try {
+                                                Thread.sleep(150);
+                                          } catch (InterruptedException e) {
+                                                // TODO Auto-generated catch block
+                                                e.printStackTrace();
+                                          }
+                                          try {
+                                                Checking_winner(event);
+                                          } catch (InterruptedException ex) {
+                                                System.err.println("InterruptedException occurred");
+                                                // ex.printStackTrace();
+                                          }
+                                    }
+                              });
+                              break;
+                        }      
+                        else if (Logic.Game_Tied(UpdatedGrid())) 
                         {
-                              ClearTextBox();
+                              Platform.runLater(() -> {
+                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                                    alert.setTitle("Game TIED");
+                                    alert.setHeaderText(null);
+                                    alert.setContentText("There is a tie between both parties, do you want to paly again?");
+
+                                    Optional<ButtonType> result = alert.showAndWait();
+                              
+                                    if (result.isPresent() && result.get() == ButtonType.OK)
+                                    {
+                                          ClearTextBox();
+                                          Logic.clearArray(Grid);
+                                          try {
+                                                Thread.sleep(150);
+                                          } catch (InterruptedException e) {
+                                                // TODO Auto-generated catch block
+                                                e.printStackTrace();
+                                          }
+                                          try {
+                                                Checking_winner(event);
+                                          } catch (InterruptedException ex) {
+                                                System.err.println("InterruptedException occurred");
+                                                // ex.printStackTrace();
+                                          }
+                                    }
+                              });
+                              break;
                         }
-                  
                   }
-                  
-
-                  }
-
-      } catch (Exception e) { System.err.println("Something went wrong");}
-
+            } catch (RuntimeException ex) {
+                  System.err.println("RuntimeException occurred");
+                  // ex.printStackTrace();
+            }
       }).start();
-
-
-
-     
-      // else if (Logic.NotAllowedChars(UpdatedGrid()))
-      // {
-      //     Alert alert = new Alert(Alert.AlertType.WARNING);
-      //       alert.setTitle("False Characters");
-      //       alert.setHeaderText(null);
-      //       alert.setContentText("You play TicTacToe, only use \"X\" and \"O\" ");
-      //       alert.showAndWait(); // blockiert bis Benutzer schließt
-      // }
-
     }
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
       cb_mode.getItems().addAll(Mode);
+
+      bottom_left.setEditable(false);
+      bottom_middle.setEditable(false);
+      bottom_right.setEditable(false);
+
+      middle_left.setEditable(false);
+      middle_middle.setEditable(false);
+      middle_right.setEditable(false);
+
+      top_left.setEditable(false);
+      top_middle.setEditable(false);
+      top_right.setEditable(false);
     }
 
 

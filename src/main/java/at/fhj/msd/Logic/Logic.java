@@ -38,6 +38,10 @@ public class Logic {
                   for (int j = 0; j < 3; j++)
                   {
                         Checker.add(Grid[i][i]);
+                         if (Grid[i][j] == null)
+                        {
+                              return true;
+                        }
                   } 
             }
             if (Checker.stream().allMatch(values -> "X".equals(values) || "O".equals(values) || "".equals(values)))
@@ -60,6 +64,10 @@ public class Logic {
                   for (int j = 0; j < 3; j++)
                   {
                         Checker.add(Grid[i][i]);
+                         if (Grid[i][j] == null)
+                        {
+                              return false;
+                        }
                   } 
             }
             if (Checker.stream().allMatch(values -> "X".equals(values) || "O".equals(values)))

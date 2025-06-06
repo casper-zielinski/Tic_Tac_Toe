@@ -3,6 +3,13 @@
       "configurations": [
         {
           "type": "java",
+          "name": "Main",
+          "request": "launch",
+          "mainClass": "at.fhj.msd.Main",
+          "projectName": "Tic_Tac_Toe"
+        },
+        {
+          "type": "java",
           "name": "App",
           "request": "launch",
           "mainClass": "at.fhj.msd.App",

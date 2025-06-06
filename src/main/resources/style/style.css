@@ -1,9 +1,25 @@
 TextField{
       font-size:xx-large;
       -fx-font-size: xx-large;
+      -fx-background-color: #c64ccd; /* Light blue background */
+}
+
+#top_left{
+      -fx-border-radius: 10 0 0 0;
+}
+
+#top_right{
+      -fx-border-radius: 0 10 0 0;
+}
+
+#bottom_right{
+      -fx-border-radius: 0 0 10 0;
+}
+
+#bottom_left{
+      -fx-border-radius: 0 0 0 10;
 }
 
 AnchorPane{
-      background-color: rgb(200, 242, 200);
-      -fx-background-color: rgb(200, 242, 200);
+      -fx-background-color: #8cbbc2;
 }
