@@ -13,12 +13,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class TicTacToeController implements Initializable{
+
+    @FXML
+    private Label Playing_text;
+
+    @FXML
+    private Label X_O_Indicator;
 
     @FXML
     private TextField bottom_left;
@@ -64,6 +70,8 @@ public class TicTacToeController implements Initializable{
      */
     @FXML
     void Exit(ActionEvent event) {
+      check_isrunning = false;
+      System.exit(0);
       stage = (Stage) btn_exit.getScene().getWindow();
       stage.close();
     }
@@ -122,7 +130,7 @@ public class TicTacToeController implements Initializable{
                   alert.setContentText("The Game has been reset!");
                   alert.showAndWait();
                   try {
-                        Checking_winner(event);
+                        Checker();
                   } catch (InterruptedException e) {
                        new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner.").showAndWait();
                         e.printStackTrace();
@@ -172,26 +180,37 @@ public class TicTacToeController implements Initializable{
      * All those methods are used to set the text of the TextFields
      * based on the current player (X or O).
      */
+
+    void Indicator_Text_Setter(String value)
+    {
+      X_O_Indicator.setText(value);
+    }
+
     @FXML
     void setX_or_O_1(MouseEvent event) {
       if (x_or_y % 2 == 0)
       {
             top_left.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             top_left.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
 
     @FXML
+    @SuppressWarnings("unused")
     void setX_or_O_2(MouseEvent event) {
       if (x_or_y % 2 == 0)
       {
             top_middle.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             top_middle.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
@@ -201,9 +220,11 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             top_right.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             top_right.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
@@ -213,9 +234,11 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             middle_left.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             middle_left.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
@@ -225,9 +248,11 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             middle_middle.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             middle_middle.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
@@ -237,9 +262,11 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             middle_right.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             middle_right.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
@@ -249,9 +276,12 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             bottom_left.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             bottom_left.setText("O");
+            Indicator_Text_Setter("X");
+
       }
       x_or_y++;
     }
@@ -261,9 +291,11 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             bottom_middle.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             bottom_middle.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
@@ -273,13 +305,38 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             bottom_right.setText("X");
+            Indicator_Text_Setter("O");
       }
       else{
             bottom_right.setText("O");
+            Indicator_Text_Setter("X");
       }
       x_or_y++;
     }
 
+    /**
+     * Calling the Checking_winner Method and checking for Errors 
+     */
+    void Checker() throws InterruptedException{
+      new Thread(() -> {
+            try{
+                 Checking_winner(); 
+            }
+            catch (InterruptedException e)
+            {
+                  System.out.println("Checker Method exception");
+            }
+            catch (Exception e)
+            {
+                  System.out.println("Checker Method Error");
+                  e.printStackTrace();
+            }
+            
+      }).start();
+    }
+
+    private volatile boolean check_isrunning = false;
+    private volatile Logic logic = new Logic();
 
     /**
      * Note: This method is called to check if the game has been won or tied.
@@ -289,14 +346,15 @@ public class TicTacToeController implements Initializable{
      * @throws InterruptedException
      */
     @FXML
-    void Checking_winner(ActionEvent event) throws InterruptedException{
-
-      new Thread(() -> {
+    void Checking_winner() throws InterruptedException{
+      
             try {
+                  check_isrunning = true;
                   // Check if the game is won or tied
                   // and display an alert accordingly
-                  while (true) { 
-                        if (Logic.Game_Won(UpdatedGrid()) && !Logic.NotAllowedChars(UpdatedGrid()))
+                  while (check_isrunning) {
+
+                        if (logic.Game_Won(UpdatedGrid()) && !logic.NotAllowedChars(UpdatedGrid()))
                         {
                               Platform.runLater(() -> {
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -309,11 +367,12 @@ public class TicTacToeController implements Initializable{
                                     {
                                           ClearTextBox();
                                           Logic.clearArray(Grid);
-
+                                          check_isrunning = false;
                                           
                                           // Removed Thread.sleep(150); as it is not recommended in UI/game logic
                                           try {
-                                                Checking_winner(event);
+                                                
+                                                Checker();
                                           } catch (InterruptedException ex) {
                                                 System.err.println("InterruptedException occurred");
                                                 // ex.printStackTrace();
@@ -323,9 +382,10 @@ public class TicTacToeController implements Initializable{
                               break;
                         }     
 
-                        else if (Logic.Game_Tied(UpdatedGrid())) 
+                        else if (logic.Game_Tied(UpdatedGrid())) 
                         {
-                              
+                              Platform.runLater(() -> {
+
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                                     alert.setTitle("Game TIED");
                                     alert.setHeaderText(null);
@@ -337,23 +397,21 @@ public class TicTacToeController implements Initializable{
                                     {
                                           ClearTextBox();
                                           Logic.clearArray(Grid);
-
-                                          // try {
-                                          //       Thread.sleep(150);
-                                          // } catch (InterruptedException e) {
-                                          //       
-                                          //       e.printStackTrace();
-                                          // }
+                                          check_isrunning = false;
 
                                           try {
-                                                Checking_winner(event);
+                                                Checker();
                                           } catch (InterruptedException ex) {
                                                 System.err.println("InterruptedException occurred");
                                                 // ex.printStackTrace();
                                           }
                                     }
                               
+                                    
+                              });
+
                               break;
+                                    
                         }
 
                   }
@@ -362,7 +420,7 @@ public class TicTacToeController implements Initializable{
                   System.err.println("RuntimeException occurred");
                   // ex.printStackTrace();
             }
-      }).start();
+      
     }
 
 
@@ -389,6 +447,13 @@ public class TicTacToeController implements Initializable{
       top_left.setEditable(false);
       top_middle.setEditable(false);
       top_right.setEditable(false);
+
+      try {
+           Checker();
+      } catch (InterruptedException e) {
+            System.out.println("initialize Method error for calling Checker, Interrupted Exception");
+            e.printStackTrace();
+      }
     }
 
 }

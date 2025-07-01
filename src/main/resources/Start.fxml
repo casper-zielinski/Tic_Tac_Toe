@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="478.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.fhj.msd.StartController">
+<FlowPane fx:id="StartPane" alignment="CENTER" columnHalignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="603.0" prefWidth="660.0" vgap="40.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.fhj.msd.StartController">
    <children>
-      <Label fx:id="TicTacToeStart_lbl" layoutX="233.0" layoutY="37.0" text="Tic-Tac-Toe" textAlignment="CENTER">
+      <Label alignment="CENTER" contentDisplay="TOP" text="Tic Tac Toe">
          <font>
-            <Font name="System Bold" size="23.0" />
+            <Font name="System Bold" size="25.0" />
          </font>
       </Label>
-      <ImageView fx:id="TicTacToe_Img" fitHeight="150.0" fitWidth="200.0" layoutX="225.0" layoutY="304.0" pickOnBounds="true" preserveRatio="true">
+      <FlowPane fx:id="Option_Pane" alignment="CENTER" columnHalignment="CENTER" hgap="20.0" orientation="VERTICAL" prefHeight="237.0" prefWidth="200.0" vgap="30.0">
+         <children>
+            <Button fx:id="btn_start" mnemonicParsing="false" onAction="#Start_game" text="Start" />
+            <Button fx:id="btn_rules" mnemonicParsing="false" onAction="#show_Rules" text="Rules" />
+            <Button fx:id="btn_exit" mnemonicParsing="false" onAction="#Exit" text="Exit" />
+         </children>
+      </FlowPane>
+      <ImageView fx:id="TicTacToe_Img" fitHeight="159.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@TicTacToe.png" />
          </image>
       </ImageView>
-      <Pane fx:id="Option_Pane" layoutX="200.0" layoutY="89.0" prefHeight="186.0" prefWidth="200.0">
-         <children>
-            <Button fx:id="btn_start" layoutX="24.0" layoutY="14.0" mnemonicParsing="false" onAction="#Start_game" text="Start Game" />
-            <Button fx:id="btn_rules" layoutX="24.0" layoutY="70.0" mnemonicParsing="false" onAction="#show_Rules" prefHeight="25.0" prefWidth="76.0" text="Rules" />
-            <Button fx:id="btn_exit" layoutX="24.0" layoutY="130.0" mnemonicParsing="false" onAction="#Exit" prefHeight="25.0" prefWidth="76.0" text="Exit" />
-         </children>
-      </Pane>
-      <VBox layoutX="14.0" layoutY="54.0" prefHeight="200.0" prefWidth="100.0" />
-      <VBox layoutX="64.0" prefHeight="200.0" prefWidth="100.0" />
    </children>
-</AnchorPane>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+</FlowPane>

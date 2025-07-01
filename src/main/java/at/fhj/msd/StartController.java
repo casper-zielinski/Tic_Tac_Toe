@@ -16,8 +16,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 
 public class StartController implements Initializable {
@@ -38,10 +37,7 @@ public class StartController implements Initializable {
     private Button btn_start;
 
     @FXML
-    private Pane Option_Pane;
-
-    private Button playerVsPlayerButton;
-    private Button playerVsComputerButton;
+    private FlowPane Option_Pane;
 
 
     /**

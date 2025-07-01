@@ -14,7 +14,7 @@ Button{
       -fx-border-radius: 10px; /* Rounded corners for the pane */
 }
 
-AnchorPane{
+#StartPane{
       -fx-background-color: #a5ccd2; /* Light gray background */
       -fx-padding: 10px; /* Padding around the pane */
 }

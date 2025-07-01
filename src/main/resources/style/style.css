@@ -23,3 +23,7 @@ TextField{
 AnchorPane{
       -fx-background-color: #8cbbc2;
 }
+
+Label{
+      -fx-backgroung-color: #267854;
+}
