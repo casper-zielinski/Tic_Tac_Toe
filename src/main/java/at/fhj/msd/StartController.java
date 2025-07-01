@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -95,6 +96,9 @@ public class StartController implements Initializable {
       dialog.setHeaderText("Welcome to Tic Tac Toe!");
       dialog.setContentText("How do you want to play?\n 1. Player vs Player\n 2. Player vs Computer");
       dialog.getDialogPane().getButtonTypes().addAll(playerVsComputer,playerVsPlayer, ButtonType.CANCEL);	
+      DialogPane dialogPane = dialog.getDialogPane();
+      dialogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+      dialogPane.getStyleClass().add("custom-alert");
 
       result = dialog.showAndWait();
 

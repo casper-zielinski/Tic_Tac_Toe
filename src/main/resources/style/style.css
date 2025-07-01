@@ -4,6 +4,10 @@ TextField{
       -fx-background-color: #c64ccd; /* Light blue background */
 }
 
+TextField:hover{
+      -fx-cursor: hand;
+}
+
 #top_left{
       -fx-border-radius: 10 0 0 0;
 }

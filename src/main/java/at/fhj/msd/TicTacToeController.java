@@ -2,6 +2,7 @@ package at.fhj.msd;
 
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -13,8 +14,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
@@ -85,15 +89,7 @@ public class TicTacToeController implements Initializable{
     private String safeText(TextField tf) {
     return tf != null ? tf.getText() : "";
     }
-
-    // Initialize the grid with the text from the TextFields
-      private String[][] Grid = {
-      { safeText(top_left), safeText(top_middle), safeText(top_right) },
-      { safeText(middle_left), safeText(middle_middle), safeText(middle_right) },
-      { safeText(bottom_left), safeText(bottom_middle), safeText(bottom_right) }
-      };
                               
-   
       /**
        * This method clears the text in all TextFields.
        * It sets the text of each TextField to an empty string.
@@ -128,12 +124,23 @@ public class TicTacToeController implements Initializable{
                   alert.setTitle("Reset");
                   alert.setHeaderText(null);
                   alert.setContentText("The Game has been reset!");
+                  alert.setGraphic(icon);
+
+                  DialogPane dialogPane = alert.getDialogPane();
+                  dialogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+
                   alert.showAndWait();
                   try {
                         Checker();
                   } catch (InterruptedException e) {
-                       new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner.").showAndWait();
-                        e.printStackTrace();
+                       Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                       ErrorAlert.setTitle("An Error Occurred");
+                       ErrorAlert.setGraphic(icon);
+                       DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                       dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                       ErrorAlert.showAndWait();
+
+                       e.printStackTrace();
                   }
             });
             
@@ -174,17 +181,20 @@ public class TicTacToeController implements Initializable{
       }
     }
 
-
+    /*
+     * to set the Label of the next Player (X or O)
+     */
+    void Indicator_Text_Setter(String value)
+    {
+      X_O_Indicator.setText(value);
+    }
 
     /**
      * All those methods are used to set the text of the TextFields
      * based on the current player (X or O).
      */
 
-    void Indicator_Text_Setter(String value)
-    {
-      X_O_Indicator.setText(value);
-    }
+   
 
     @FXML
     void setX_or_O_1(MouseEvent event) {
@@ -337,7 +347,11 @@ public class TicTacToeController implements Initializable{
 
     private volatile boolean check_isrunning = false;
     private volatile Logic logic = new Logic();
-
+    private String[][] Grid;
+    private volatile int log_Grid = 0;
+    private volatile boolean label_text_start = true;
+    private ImageView icon = new ImageView(new Image(getClass().getResource("/TicTacToe.png").toExternalForm()));
+    
     /**
      * Note: This method is called to check if the game has been won or tied.
      * It runs in a separate thread to avoid blocking the UI.
@@ -350,17 +364,39 @@ public class TicTacToeController implements Initializable{
       
             try {
                   check_isrunning = true;
+                  log_Grid = 0;
+                  if (label_text_start) Indicator_Text_Setter("X");
+                  label_text_start = false;
+                  icon.setFitHeight(48);
+                  icon.setFitWidth(48);
+
+                  
+                  
                   // Check if the game is won or tied
                   // and display an alert accordingly
                   while (check_isrunning) {
 
-                        if (logic.Game_Won(UpdatedGrid()) && !logic.NotAllowedChars(UpdatedGrid()))
+                        Grid = UpdatedGrid();
+                        if (log_Grid == 0) printGrid(Grid);
+
+                        log_Grid++;
+
+                        if (logic.Game_Won(Grid) && !logic.NotAllowedChars(Grid))
                         {
                               Platform.runLater(() -> {
+
+                                    printGrid(Grid);
+
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                                     alert.setTitle(getCurrentPlayer() + " has won!!!");
                                     alert.setHeaderText("Game Won");
                                     alert.setContentText(getCurrentPlayer() + " !\nYou have won the Game, do you want to play again?");
+                                    alert.setGraphic(icon);
+
+                                    DialogPane dialogPane = alert.getDialogPane();
+                                    dialogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                                    dialogPane.getStyleClass().add("custom-alert");
+
                                     Optional<ButtonType> result = alert.showAndWait();
 
                                     if (result.isPresent() && result.get() == ButtonType.OK)
@@ -382,14 +418,20 @@ public class TicTacToeController implements Initializable{
                               break;
                         }     
 
-                        else if (logic.Game_Tied(UpdatedGrid())) 
+                        else if (logic.Game_Tied(Grid)) 
                         {
                               Platform.runLater(() -> {
 
+                                    printGrid(Grid);
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                                     alert.setTitle("Game TIED");
                                     alert.setHeaderText(null);
                                     alert.setContentText("There is a tie between both parties, do you want to paly again?");
+                                    alert.setGraphic(icon);
+
+                                    DialogPane dailogPane = alert.getDialogPane();
+                                    dailogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                                    dailogPane.getStyleClass().add("custom-alert");
 
                                     Optional<ButtonType> result = alert.showAndWait();
                               
@@ -398,7 +440,7 @@ public class TicTacToeController implements Initializable{
                                           ClearTextBox();
                                           Logic.clearArray(Grid);
                                           check_isrunning = false;
-
+                                          
                                           try {
                                                 Checker();
                                           } catch (InterruptedException ex) {
@@ -455,5 +497,27 @@ public class TicTacToeController implements Initializable{
             e.printStackTrace();
       }
     }
+
+    public void printGrid(String[][] grid) {
+      System.out.println("\nAktuelles Spielfeld:");
+      for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                  String value = grid[i][j];
+                  if (value == null || value.isEmpty()) {
+                  System.out.print("   "); // Leeres Feld
+                  } else {
+                  System.out.print(" " + value + " ");
+                  }
+
+                  if (j < grid[i].length - 1) {
+                  System.out.print("|");
+                  }
+            }
+            System.out.println();
+            if (i < grid.length - 1) {
+                  System.out.println("---+---+---");
+            }
+      }
+   }
 
 }

@@ -7,10 +7,8 @@ import java.util.List;
  */
 public class Logic {
 
-      public String[][] Grid;
       public String X = "X";
       public String O = "O";
-      public String[] Possible_Anwsers = {"X","O"};
       public List<String> Checker = new ArrayList<>();
 
       public static String[][] clearArray (String[][] Grid)
@@ -80,7 +78,7 @@ public class Logic {
        */
       public boolean Game_Won(String[][] Grid)
       {
-          return (Rows_Same(Grid) || Colums_Same(Grid) || Dialoganly_Same(Grid)) && OnlyX_O(Grid);
+          return (Rows_Same(Grid) || Colums_Same(Grid) || Dialoganly_Same(Grid)) && !NotAllowedChars(Grid);
       }
 
       public boolean Game_Tied(String[][] Grid)
@@ -95,16 +93,17 @@ public class Logic {
             
 
             String mid = Grid[1][1];
-    if (!mid.equals("") &&
-        ((mid.equals(Grid[0][0]) && mid.equals(Grid[2][2])) ||
-         (mid.equals(Grid[0][2]) && mid.equals(Grid[2][0])))) {
-        return true;
-    }
-    return false;
+            
+            if (!mid.equals("") &&
+                  ((mid.equals(Grid[0][0]) && mid.equals(Grid[2][2])) ||
+                  (mid.equals(Grid[0][2]) && mid.equals(Grid[2][0])))) return true;
+                                
+            else return false;
       }
 
       /**
        * Checks the Colums
+       * 
        */
       private boolean Colums_Same( String[][] Grid) {
             for (int i = 0; i < Grid.length; i++)
