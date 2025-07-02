@@ -4,7 +4,6 @@ package at.fhj.msd;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -22,6 +21,7 @@ public class Main extends Application{
             scene.getStylesheets().add(getClass().getResource("/style/start.css").toExternalForm());            
             Stage.setScene(scene);
             Stage.setTitle("Tic Tac Toe");
+            Stage.setOnCloseRequest(e -> System.exit(0));
             Image icon = new Image(getClass().getResourceAsStream("/TicTacToe.png"));
             Stage.getIcons().add(icon); 
             Stage.show();

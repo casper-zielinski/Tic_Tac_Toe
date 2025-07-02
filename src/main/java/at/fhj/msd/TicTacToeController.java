@@ -2,7 +2,6 @@ package at.fhj.msd;
 
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -28,7 +27,7 @@ public class TicTacToeController implements Initializable{
     private Label Playing_text;
 
     @FXML
-    private Label X_O_Indicator;
+    private volatile Label next_Player = new Label();
 
     @FXML
     private TextField bottom_left;
@@ -58,15 +57,16 @@ public class TicTacToeController implements Initializable{
     private TextField top_right;
 
     @FXML
-    private Button btn_check;
-
-    @FXML
     private Button btn_reset;
 
    @FXML
     private Button btn_exit;
 
     private Stage stage;
+
+    private String[][] Grid = {{"","",""},
+                               {"","",""},           
+                               {"","",""}}; //The Grid that is being played
 
     /**
      * To Exit the application when the exit button is clicked.
@@ -146,7 +146,7 @@ public class TicTacToeController implements Initializable{
             
       }
 
-      private String[][] UpdatedGrid()
+      private String[][] gridSetter()
       {
             String[][] Updated = {
             { safeText(top_left), safeText(top_middle), safeText(top_right) },
@@ -184,9 +184,9 @@ public class TicTacToeController implements Initializable{
     /*
      * to set the Label of the next Player (X or O)
      */
-    void Indicator_Text_Setter(String value)
+    void next_Player_setter(String value)
     {
-      X_O_Indicator.setText(value);
+      next_Player.setText(value);
     }
 
     /**
@@ -201,11 +201,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             top_left.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[0][0] = "X";
+            next_Player_setter("O");
       }
       else{
             top_left.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[0][0] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -216,11 +218,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             top_middle.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[0][1] = "X";
+            next_Player_setter("O");
       }
       else{
             top_middle.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[0][1] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -230,11 +234,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             top_right.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[0][2] = "X";
+            next_Player_setter("O");
       }
       else{
             top_right.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[0][2] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -244,11 +250,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             middle_left.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[1][0] = "X";
+            next_Player_setter("O");
       }
       else{
             middle_left.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[1][0] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -258,11 +266,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             middle_middle.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[1][1] = "X";
+            next_Player_setter("O");
       }
       else{
             middle_middle.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[1][1] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -272,11 +282,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             middle_right.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[1][2] = "X";
+            next_Player_setter("O");
       }
       else{
             middle_right.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[1][2] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -286,11 +298,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             bottom_left.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[2][0] = "X";
+            next_Player_setter("O");
       }
       else{
             bottom_left.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[2][0] = "O";
+            next_Player_setter("X");
 
       }
       x_or_y++;
@@ -301,11 +315,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             bottom_middle.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[2][1] = "X";
+            next_Player_setter("O");
       }
       else{
             bottom_middle.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[2][1] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -315,11 +331,13 @@ public class TicTacToeController implements Initializable{
       if (x_or_y % 2 == 0)
       {
             bottom_right.setText("X");
-            Indicator_Text_Setter("O");
+            this.Grid[2][2] = "X";
+            next_Player_setter("O");
       }
       else{
             bottom_right.setText("O");
-            Indicator_Text_Setter("X");
+            this.Grid[2][2] = "O";
+            next_Player_setter("X");
       }
       x_or_y++;
     }
@@ -347,10 +365,10 @@ public class TicTacToeController implements Initializable{
 
     private volatile boolean check_isrunning = false;
     private volatile Logic logic = new Logic();
-    private String[][] Grid;
+    
     private volatile int log_Grid = 0;
     private volatile boolean label_text_start = true;
-    private ImageView icon = new ImageView(new Image(getClass().getResource("/TicTacToe.png").toExternalForm()));
+    private final ImageView icon = new ImageView(new Image(getClass().getResource("/TicTacToe.png").toExternalForm()));
     
     /**
      * Note: This method is called to check if the game has been won or tied.
@@ -365,10 +383,11 @@ public class TicTacToeController implements Initializable{
             try {
                   check_isrunning = true;
                   log_Grid = 0;
-                  if (label_text_start) Indicator_Text_Setter("X");
+                  if (label_text_start) Platform.runLater(() -> next_Player_setter("X")); 
                   label_text_start = false;
                   icon.setFitHeight(48);
                   icon.setFitWidth(48);
+                  this.Grid = gridSetter();
 
                   
                   
@@ -376,16 +395,15 @@ public class TicTacToeController implements Initializable{
                   // and display an alert accordingly
                   while (check_isrunning) {
 
-                        Grid = UpdatedGrid();
-                        if (log_Grid == 0) printGrid(Grid);
+                        if (log_Grid == 0) printGrid(this.Grid);
 
-                        log_Grid++;
+                        log_Grid = 1;
 
-                        if (logic.Game_Won(Grid) && !logic.NotAllowedChars(Grid))
+                        if (logic.Game_Won(this.Grid) && !logic.NotAllowedChars(this.Grid))
                         {
                               Platform.runLater(() -> {
 
-                                    printGrid(Grid);
+                                    printGrid(this.Grid);
 
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                                     alert.setTitle(getCurrentPlayer() + " has won!!!");
@@ -402,27 +420,25 @@ public class TicTacToeController implements Initializable{
                                     if (result.isPresent() && result.get() == ButtonType.OK)
                                     {
                                           ClearTextBox();
-                                          Logic.clearArray(Grid);
                                           check_isrunning = false;
                                           
                                           // Removed Thread.sleep(150); as it is not recommended in UI/game logic
                                           try {
-                                                
                                                 Checker();
                                           } catch (InterruptedException ex) {
-                                                System.err.println("InterruptedException occurred");
-                                                // ex.printStackTrace();
+                                                System.err.println("InterruptedException occurred, could not call Checker");
                                           }
                                     }
                               });
                               break;
                         }     
 
-                        else if (logic.Game_Tied(Grid)) 
+                        else if (logic.Game_Tied(this.Grid)) 
                         {
                               Platform.runLater(() -> {
 
-                                    printGrid(Grid);
+                                    printGrid(this.Grid);
+
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                                     alert.setTitle("Game TIED");
                                     alert.setHeaderText(null);
@@ -438,7 +454,6 @@ public class TicTacToeController implements Initializable{
                                     if (result.isPresent() && result.get() == ButtonType.OK)
                                     {
                                           ClearTextBox();
-                                          Logic.clearArray(Grid);
                                           check_isrunning = false;
                                           
                                           try {
@@ -496,6 +511,9 @@ public class TicTacToeController implements Initializable{
             System.out.println("initialize Method error for calling Checker, Interrupted Exception");
             e.printStackTrace();
       }
+
+
+
     }
 
     public void printGrid(String[][] grid) {

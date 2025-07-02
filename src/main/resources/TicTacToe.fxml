@@ -39,7 +39,7 @@
       </Label>
       <Button fx:id="btn_reset" layoutX="326.0" layoutY="485.0" minHeight="30.0" minWidth="50.0" mnemonicParsing="false" onAction="#Reset_tb" text="Reset" />
       <Button fx:id="btn_exit" layoutX="226.0" layoutY="485.0" minHeight="30.0" minWidth="50.0" mnemonicParsing="false" onAction="#Exit" text="Exit" />
-      <Label fx:id="Playing_text" layoutX="37.0" layoutY="84.0" prefHeight="24.0" prefWidth="73.0" text="Now Playing: " />
-      <Label fx:id="X_O_Indicator" layoutX="123.0" layoutY="88.0" />
+      <Label fx:id="Playing_text" layoutX="14.0" layoutY="82.0" prefHeight="30.0" prefWidth="124.0" text="Now Playing: " />
+      <Label fx:id="X_O_Indicator" layoutX="141.0" layoutY="88.0" prefHeight="24.0" prefWidth="59.0" />
    </children>
 </AnchorPane>

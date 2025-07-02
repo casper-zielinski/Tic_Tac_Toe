@@ -2,32 +2,35 @@ TextField{
       font-size:xx-large;
       -fx-font-size: xx-large;
       -fx-background-color: #c64ccd; /* Light blue background */
-}
-
-TextField:hover{
       -fx-cursor: hand;
 }
 
-#top_left{
-      -fx-border-radius: 10 0 0 0;
-}
-
-#top_right{
-      -fx-border-radius: 0 10 0 0;
-}
-
-#bottom_right{
-      -fx-border-radius: 0 0 10 0;
-}
-
-#bottom_left{
-      -fx-border-radius: 0 0 0 10;
+TextField:hover{
+      -fx-background-color:#a63fac
 }
 
 AnchorPane{
       -fx-background-color: #8cbbc2;
 }
 
-Label{
-      -fx-backgroung-color: #267854;
+#next_Player, #Playing_text{
+      -fx-text-fill: #3da11f;
+      -fx-font-weight: bold;
+}
+
+#btn_reset, #btn_exit{
+      -fx-background-color: #3399ff;
+      -fx-font-weight: bold;
+      -fx-border-radius: 20px;
+}
+
+#btn_exit:hover{
+      -fx-text-fill: white;
+      -fx-background-color: #2f4f7f;
+      -fx-effect: dropshadow(gaussian, rgb(0,0,0,0.5), 9, 0.4, 2, 2); /* Shadow effect on hover */
+}
+#btn_reset:hover{
+      -fx-text-fill: white;
+      -fx-background-color: #2f4f7f;
+      -fx-effect: dropshadow(gaussian, rgb(0,0,0,0.5), 9, 0.4, 2, 2); /* Shadow effect on hover */
 }
