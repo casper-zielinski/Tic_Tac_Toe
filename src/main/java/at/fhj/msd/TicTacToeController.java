@@ -1,7 +1,8 @@
 package at.fhj.msd;
 
-
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -21,14 +22,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
-public class TicTacToeController implements Initializable{
+public class TicTacToeController implements Initializable {
 
     @FXML
     private Label Playing_text;
 
     @FXML
-    private volatile Label next_Player = new Label();
+    private volatile Label next_Player = new Label(); //Shows the next player's turn (X or O)
+    private Map<String, TextField> textfields = new HashMap<>();
 
+    /**
+     * All the Fields that are clickable and their corresponding labels
+     */
     @FXML
     private TextField bottom_left;
 
@@ -56,486 +61,548 @@ public class TicTacToeController implements Initializable{
     @FXML
     private TextField top_right;
 
+    /**
+     * Buttons to start a new game and to quit the application
+     */
     @FXML
     private Button btn_reset;
 
-   @FXML
+    @FXML
     private Button btn_exit;
 
+    /**
+     * Current stage used to exit the game
+     */
     private Stage stage;
 
-    private String[][] Grid = {{"","",""},
-                               {"","",""},           
-                               {"","",""}}; //The Grid that is being played
+    private String[][] Grid = {{"", "", ""},
+    {"", "", ""},
+    {"", "", ""}}; //The Grid that is being played
 
     /**
      * To Exit the application when the exit button is clicked.
+     *
      * @param event
      */
     @FXML
     void Exit(ActionEvent event) {
-      check_isrunning = false;
-      System.exit(0);
-      stage = (Stage) btn_exit.getScene().getWindow();
-      stage.close();
+        System.exit(0);
+        stage = (Stage) btn_exit.getScene().getWindow();
+        stage.close();
     }
 
     /**
-     * This method is used to safely get the text from a TextField.
-     * If the TextField is null, it returns an empty string.
+     * This method is used to safely get the text from a TextField. If the
+     * TextField is null, it returns an empty string.
+     *
      * @param tf The TextField from which to get the text.
-     * @return The text from the TextField or an empty string if the TextField is null.
+     * @return The text from the TextField or an empty string if the TextField
+     * is null.
      */
     private String safeText(TextField tf) {
-    return tf != null ? tf.getText() : "";
+        return tf != null ? tf.getText() : "";
     }
-                              
-      /**
-       * This method clears the text in all TextFields.
-       * It sets the text of each TextField to an empty string.
-       */
-      private void ClearTextBox() {
-            
-            top_left.setText("");
-            top_middle.setText("");
-            top_right.setText("");
-
-            middle_left.setText("");
-            middle_middle.setText("");
-            middle_right.setText("");
-
-            bottom_left.setText("");
-            bottom_middle.setText("");
-            bottom_right.setText("");
-      }
-
-      /**
-       * This method resets the game by clearing the TextFields and the grid.
-       * It also displays an alert to inform the user that the game has been reset.
-       * It is called when the reset button is clicked.
-       */
-      @FXML
-      @SuppressWarnings("CallToPrintStackTrace")
-      void Reset_tb(ActionEvent event) {
-            ClearTextBox();
-            Logic.clearArray(Grid);
-            Platform.runLater(() -> {
-                  Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                  alert.setTitle("Reset");
-                  alert.setHeaderText(null);
-                  alert.setContentText("The Game has been reset!");
-                  alert.setGraphic(icon);
-
-                  DialogPane dialogPane = alert.getDialogPane();
-                  dialogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-
-                  alert.showAndWait();
-                  try {
-                        Checker();
-                  } catch (InterruptedException e) {
-                       Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-                       ErrorAlert.setTitle("An Error Occurred");
-                       ErrorAlert.setGraphic(icon);
-                       DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-                       dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-                       ErrorAlert.showAndWait();
-
-                       e.printStackTrace();
-                  }
-            });
-            
-      }
-
-      private String[][] gridSetter()
-      {
-            String[][] Updated = {
-            { safeText(top_left), safeText(top_middle), safeText(top_right) },
-            { safeText(middle_left), safeText(middle_middle), safeText(middle_right) },
-            { safeText(bottom_left), safeText(bottom_middle), safeText(bottom_right) }
-            };
-
-            return Updated;
-      }
-      
-
-
-
- /**
-  * This variable keeps track of the current player/variable.
-  */
-    private int x_or_y  = 0;
 
     /**
-     * This method returns the current player based on the value of x_or_y.
-     * If x_or_y is even, it returns "O", otherwise it returns "X".
+     * This method clears the text in all TextFields. It sets the text of each
+     * TextField to an empty string.
+     */
+    private void ClearTextBox() {
+
+        top_left.setText("");
+        top_middle.setText("");
+        top_right.setText("");
+
+        middle_left.setText("");
+        middle_middle.setText("");
+        middle_right.setText("");
+
+        bottom_left.setText("");
+        bottom_middle.setText("");
+        bottom_right.setText("");
+    }
+
+    /**
+     * This method resets the game by clearing the TextFields and the grid. It
+     * also displays an alert to inform the user that the game has been reset.
+     * It is called when the reset button is clicked.
+     */
+    @FXML
+    @SuppressWarnings("CallToPrintStackTrace")
+    void Reset_tb(ActionEvent event) {
+        ClearTextBox();
+        Logic.clearArray(this.Grid);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Reset");
+            alert.setHeaderText(null);
+            alert.setContentText("The Game has been reset!");
+            alert.setGraphic(icon);
+
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+
+            alert.showAndWait();
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    /**
+     * Method to set up the grid layout.
+     */
+    private String[][] gridSetter() {
+        String[][] Updated = {
+            {safeText(top_left), safeText(top_middle), safeText(top_right)},
+            {safeText(middle_left), safeText(middle_middle), safeText(middle_right)},
+            {safeText(bottom_left), safeText(bottom_middle), safeText(bottom_right)}
+        };
+
+        return Updated;
+    }
+
+    /**
+     * This variable keeps track of the current player/variable.
+     */
+    private int x_or_y = 0;
+
+    /**
+     * This method returns the current player based on the value of x_or_y. If
+     * x_or_y is even, it returns "O", otherwise it returns "X".
+     *
      * @return The current player as a String ("O" or "X").
      */
-    private String getCurrentPlayer() 
-    {
-      if (x_or_y % 2 == 0)
-      {
+    private String getCurrentPlayer() {
+        if (x_or_y % 2 == 0) {
             return "O";
-      }
-      else{
+        } else {
             return "X";
-      }
+        }
     }
 
     /*
      * to set the Label of the next Player (X or O)
      */
-    void next_Player_setter(String value)
-    {
-      next_Player.setText(value);
+    void next_Player_setter(String value) {
+        Platform.runLater(() -> next_Player.setText(value));
     }
 
     /**
-     * All those methods are used to set the text of the TextFields
-     * based on the current player (X or O).
+     * All those methods are used to set the text of the TextFields based on the
+     * current player (X or O).
      */
-
-   
-
     @FXML
     void setX_or_O_1(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             top_left.setText("X");
             this.Grid[0][0] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             top_left.setText("O");
             this.Grid[0][0] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     @SuppressWarnings("unused")
     void setX_or_O_2(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             top_middle.setText("X");
             this.Grid[0][1] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             top_middle.setText("O");
             this.Grid[0][1] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void setX_or_O_3(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             top_right.setText("X");
             this.Grid[0][2] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             top_right.setText("O");
             this.Grid[0][2] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void setX_or_O_4(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             middle_left.setText("X");
             this.Grid[1][0] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             middle_left.setText("O");
             this.Grid[1][0] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void setX_or_O_5(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             middle_middle.setText("X");
             this.Grid[1][1] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             middle_middle.setText("O");
             this.Grid[1][1] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void setX_or_O_6(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             middle_right.setText("X");
             this.Grid[1][2] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             middle_right.setText("O");
             this.Grid[1][2] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void setX_or_O_7(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             bottom_left.setText("X");
             this.Grid[2][0] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             bottom_left.setText("O");
             this.Grid[2][0] = "O";
             next_Player_setter("X");
 
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void setX_or_O_8(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             bottom_middle.setText("X");
             this.Grid[2][1] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             bottom_middle.setText("O");
             this.Grid[2][1] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void setX_or_O_9(MouseEvent event) {
-      if (x_or_y % 2 == 0)
-      {
+        if (x_or_y % 2 == 0) {
             bottom_right.setText("X");
             this.Grid[2][2] = "X";
             next_Player_setter("O");
-      }
-      else{
+        } else {
             bottom_right.setText("O");
             this.Grid[2][2] = "O";
             next_Player_setter("X");
-      }
-      x_or_y++;
+        }
+        x_or_y++;
+        try {
+            Checker();
+        } catch (InterruptedException e) {
+            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+            ErrorAlert.setTitle("An Error Occurred");
+            ErrorAlert.setGraphic(icon);
+            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+            ErrorAlert.showAndWait();
+
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Calling the Checking_winner Method and checking for Errors 
+     * Calling the Checking_winner Method and checking for Errors
      */
-    void Checker() throws InterruptedException{
-      new Thread(() -> {
-            try{
-                 Checking_winner(); 
+    void Checker() throws InterruptedException {
+        new Thread(() -> {
+            try {
+                Checking_winner_PlayerVsPlayer();
+            } catch (InterruptedException e) {
+                System.out.println("Checker Method exception");
+            } catch (Exception e) {
+                System.out.println("Checker Method Error");
+                e.printStackTrace();
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
             }
-            catch (InterruptedException e)
-            {
-                  System.out.println("Checker Method exception");
-            }
-            catch (Exception e)
-            {
-                  System.out.println("Checker Method Error");
-                  e.printStackTrace();
-            }
-            
-      }).start();
+
+        }).start();
     }
 
-    private volatile boolean check_isrunning = false;
     private volatile Logic logic = new Logic();
-    
-    private volatile int log_Grid = 0;
     private volatile boolean label_text_start = true;
     private final ImageView icon = new ImageView(new Image(getClass().getResource("/TicTacToe.png").toExternalForm()));
-    
+
     /**
-     * Note: This method is called to check if the game has been won or tied.
-     * It runs in a separate thread to avoid blocking the UI.
-     * Needs to be worked on to ensure it works correctly with the game logic.
+     * Note: This method is called to check if the game has been won or tied. It
+     * runs in a separate thread to avoid blocking the UI.
+     *
      * @param event
      * @throws InterruptedException
      */
     @FXML
-    void Checking_winner() throws InterruptedException{
-      
-            try {
-                  check_isrunning = true;
-                  log_Grid = 0;
-                  if (label_text_start) Platform.runLater(() -> next_Player_setter("X")); 
-                  label_text_start = false;
-                  icon.setFitHeight(48);
-                  icon.setFitWidth(48);
-                  this.Grid = gridSetter();
+    void Checking_winner_PlayerVsPlayer() throws InterruptedException {
 
-                  
-                  
-                  // Check if the game is won or tied
-                  // and display an alert accordingly
-                  while (check_isrunning) {
+        try {
 
-                        if (log_Grid == 0) printGrid(this.Grid);
-
-                        log_Grid = 1;
-
-                        if (logic.Game_Won(this.Grid) && !logic.NotAllowedChars(this.Grid))
-                        {
-                              Platform.runLater(() -> {
-
-                                    printGrid(this.Grid);
-
-                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                                    alert.setTitle(getCurrentPlayer() + " has won!!!");
-                                    alert.setHeaderText("Game Won");
-                                    alert.setContentText(getCurrentPlayer() + " !\nYou have won the Game, do you want to play again?");
-                                    alert.setGraphic(icon);
-
-                                    DialogPane dialogPane = alert.getDialogPane();
-                                    dialogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-                                    dialogPane.getStyleClass().add("custom-alert");
-
-                                    Optional<ButtonType> result = alert.showAndWait();
-
-                                    if (result.isPresent() && result.get() == ButtonType.OK)
-                                    {
-                                          ClearTextBox();
-                                          check_isrunning = false;
-                                          
-                                          // Removed Thread.sleep(150); as it is not recommended in UI/game logic
-                                          try {
-                                                Checker();
-                                          } catch (InterruptedException ex) {
-                                                System.err.println("InterruptedException occurred, could not call Checker");
-                                          }
-                                    }
-                              });
-                              break;
-                        }     
-
-                        else if (logic.Game_Tied(this.Grid)) 
-                        {
-                              Platform.runLater(() -> {
-
-                                    printGrid(this.Grid);
-
-                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                                    alert.setTitle("Game TIED");
-                                    alert.setHeaderText(null);
-                                    alert.setContentText("There is a tie between both parties, do you want to paly again?");
-                                    alert.setGraphic(icon);
-
-                                    DialogPane dailogPane = alert.getDialogPane();
-                                    dailogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-                                    dailogPane.getStyleClass().add("custom-alert");
-
-                                    Optional<ButtonType> result = alert.showAndWait();
-                              
-                                    if (result.isPresent() && result.get() == ButtonType.OK)
-                                    {
-                                          ClearTextBox();
-                                          check_isrunning = false;
-                                          
-                                          try {
-                                                Checker();
-                                          } catch (InterruptedException ex) {
-                                                System.err.println("InterruptedException occurred");
-                                                // ex.printStackTrace();
-                                          }
-                                    }
-                              
-                                    
-                              });
-
-                              break;
-                                    
-                        }
-
-                  }
-
-            } catch (RuntimeException ex) {
-                  System.err.println("RuntimeException occurred");
-                  // ex.printStackTrace();
+            if (label_text_start) {
+                Platform.runLater(() -> next_Player_setter("X"));
             }
-      
+            label_text_start = false;
+            icon.setFitHeight(48);
+            icon.setFitWidth(48);
+            this.Grid = gridSetter();
+
+            if (logic.Game_Won(this.Grid) && !logic.NotAllowedChars(this.Grid)) {
+                Platform.runLater(() -> {
+
+                    printGrid(this.Grid);
+
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle(getCurrentPlayer() + " has won!!!");
+                    alert.setHeaderText("Game Won");
+                    alert.setContentText(getCurrentPlayer() + " !\nYou have won the Game, do you want to play again?");
+                    alert.setGraphic(icon);
+
+                    DialogPane dialogPane = alert.getDialogPane();
+                    dialogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                    dialogPane.getStyleClass().add("custom-alert");
+
+                    Optional<ButtonType> result = alert.showAndWait();
+
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                        ClearTextBox();
+
+                        try {
+                            Checker();
+                        } catch (InterruptedException ex) {
+                            System.err.println("InterruptedException occurred, could not call Checker");
+                        }
+                    }
+                });
+
+            } else if (logic.Game_Tied(this.Grid)) {
+                Platform.runLater(() -> {
+
+                    printGrid(this.Grid);
+
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Game TIED");
+                    alert.setHeaderText(null);
+                    alert.setContentText("There is a tie between both parties, do you want to paly again?");
+                    alert.setGraphic(icon);
+
+                    DialogPane dailogPane = alert.getDialogPane();
+                    dailogPane.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                    dailogPane.getStyleClass().add("custom-alert");
+
+                    Optional<ButtonType> result = alert.showAndWait();
+
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                        ClearTextBox();
+
+                        try {
+                            Checker();
+                        } catch (InterruptedException ex) {
+                            System.err.println("InterruptedException occurred");
+                            // ex.printStackTrace();
+                        }
+                    }
+
+                });
+
+            }
+
+        } catch (RuntimeException ex) {
+            System.err.println("RuntimeException occurred");
+            // ex.printStackTrace();
+        }
+
     }
 
-
     /**
-     * This method initializes the controller.
-     * It is called when the FXML file is loaded.
-     * It sets the TextFields to be non-editable
-     * to prevent users from manually changing the text.
-     * The Text is set by clicking on the TextFields, so the user can only interact with the game by clicking on them.
-     * There is no need for the user to edit the TextFields manually.
+     * This method initializes the controller. It is called when the FXML file
+     * is loaded. It sets the TextFields to be non-editable to prevent users
+     * from manually changing the text. The Text is set by clicking on the
+     * TextFields, so the user can only interact with the game by clicking on
+     * them. There is no need for the user to edit the TextFields manually.
      * That's why we set them to be non-editable.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-      bottom_left.setEditable(false);
-      bottom_middle.setEditable(false);
-      bottom_right.setEditable(false);
+        textfields.put("0-0", top_left);
+        textfields.put("0-1", top_middle);
+        textfields.put("0-2", top_right);
+        textfields.put("1-0", middle_left);
+        textfields.put("1-1", middle_middle);
+        textfields.put("1-2", middle_right);
+        textfields.put("2-0", bottom_left);
+        textfields.put("2-1", bottom_middle);
+        textfields.put("2-2", bottom_right);
 
-      middle_left.setEditable(false);
-      middle_middle.setEditable(false);
-      middle_right.setEditable(false);
-
-      top_left.setEditable(false);
-      top_middle.setEditable(false);
-      top_right.setEditable(false);
-
-      try {
-           Checker();
-      } catch (InterruptedException e) {
-            System.out.println("initialize Method error for calling Checker, Interrupted Exception");
-            e.printStackTrace();
-      }
-
-
-
+        for (Map.Entry<String, TextField> entry : textfields.entrySet()) {
+            entry.getValue().setEditable(false);
+        }
     }
 
+    /**
+     * Method to Print the Grid/Current State of the Game
+     */
     public void printGrid(String[][] grid) {
-      System.out.println("\nAktuelles Spielfeld:");
-      for (int i = 0; i < grid.length; i++) {
+        System.out.println("\nAktuelles Spielfeld:");
+        for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                  String value = grid[i][j];
-                  if (value == null || value.isEmpty()) {
-                  System.out.print("   "); // Leeres Feld
-                  } else {
-                  System.out.print(" " + value + " ");
-                  }
+                String value = grid[i][j];
+                if (value == null || value.isEmpty()) {
+                    System.out.print("   "); // Leeres Feld
+                } else {
+                    System.out.print(" " + value + " ");
+                }
 
-                  if (j < grid[i].length - 1) {
-                  System.out.print("|");
-                  }
+                if (j < grid[i].length - 1) {
+                    System.out.print("|");
+                }
             }
             System.out.println();
             if (i < grid.length - 1) {
-                  System.out.println("---+---+---");
+                System.out.println("---+---+---");
             }
-      }
-   }
+        }
+    }
 
 }

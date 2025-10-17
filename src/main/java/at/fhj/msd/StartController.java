@@ -164,8 +164,6 @@ public class StartController implements Initializable {
     void show_Rules(ActionEvent event) {
       btn_exit.setStyle("-fx-background-color: #9b1690;");//Reset button style
       btn_start.setStyle("-fx-background-color: #9b1690;");
-
-
       btn_rules.setStyle("-fx-background-color: #580b52");
     }
 
