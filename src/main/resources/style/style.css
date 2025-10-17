@@ -5,6 +5,11 @@ TextField{
       -fx-cursor: hand;
 }
 
+Button {
+      cursor: pointer;
+      -fx-cursour: pointer;
+}
+
 TextField:hover{
       -fx-background-color:#a63fac
 }

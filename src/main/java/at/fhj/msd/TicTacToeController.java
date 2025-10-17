@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import at.fhj.msd.Logic.ComputerLogic;
 import at.fhj.msd.Logic.Logic;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -24,15 +25,32 @@ import javafx.stage.Stage;
 
 public class TicTacToeController implements Initializable {
 
+    // Determines whether the game is Player vs Computer (true) or Player vs Player (false)
+    private boolean playerVsComputer;
+
+    /**
+     * Sets the game mode for the current session.
+     * Called by StartController when initializing the game scene.
+     *
+     * @param GameMode true for Player vs Computer mode, false for Player vs Player mode
+     */
+    public void setGameMode(boolean GameMode) {
+        this.playerVsComputer = GameMode;
+    }
+
     @FXML
     private Label Playing_text;
 
+    // Label that displays which player's turn is next (X or O)
     @FXML
-    private volatile Label next_Player = new Label(); //Shows the next player's turn (X or O)
+    private Label next_Player = new Label(getCurrentPlayer());
+
+    // Maps grid positions (e.g., "0-0" for row 0, column 0) to their corresponding TextField UI elements
     private Map<String, TextField> textfields = new HashMap<>();
 
     /**
-     * All the Fields that are clickable and their corresponding labels
+     * TextField UI elements representing the 3x3 Tic Tac Toe board.
+     * Each field is clickable and displays either X, O, or remains empty.
      */
     @FXML
     private TextField bottom_left;
@@ -62,7 +80,7 @@ public class TicTacToeController implements Initializable {
     private TextField top_right;
 
     /**
-     * Buttons to start a new game and to quit the application
+     * UI buttons for game control
      */
     @FXML
     private Button btn_reset;
@@ -70,19 +88,18 @@ public class TicTacToeController implements Initializable {
     @FXML
     private Button btn_exit;
 
-    /**
-     * Current stage used to exit the game
-     */
+    // Reference to the current JavaFX stage (window)
     private Stage stage;
 
+    // 3x3 array representing the game board state. Each element contains "X", "O", or "" (empty)
     private String[][] Grid = {{"", "", ""},
     {"", "", ""},
-    {"", "", ""}}; //The Grid that is being played
+    {"", "", ""}};
 
     /**
-     * To Exit the application when the exit button is clicked.
+     * Terminates the application when the exit button is clicked.
      *
-     * @param event
+     * @param event The button click event
      */
     @FXML
     void Exit(ActionEvent event) {
@@ -92,40 +109,46 @@ public class TicTacToeController implements Initializable {
     }
 
     /**
-     * This method is used to safely get the text from a TextField. If the
-     * TextField is null, it returns an empty string.
+     * Safely retrieves text from a TextField, returning an empty string if the TextField is null.
+     * Prevents NullPointerException when accessing TextField content.
      *
-     * @param tf The TextField from which to get the text.
-     * @return The text from the TextField or an empty string if the TextField
-     * is null.
+     * @param tf The TextField to read from
+     * @return The text content of the TextField, or an empty string if the TextField is null
      */
     private String safeText(TextField tf) {
         return tf != null ? tf.getText() : "";
     }
 
     /**
-     * This method clears the text in all TextFields. It sets the text of each
-     * TextField to an empty string.
+     * Clears all TextField elements on the game board by setting their text to empty strings.
+     * Used when resetting the game or starting a new round.
      */
     private void ClearTextBox() {
-
-        top_left.setText("");
-        top_middle.setText("");
-        top_right.setText("");
-
-        middle_left.setText("");
-        middle_middle.setText("");
-        middle_right.setText("");
-
-        bottom_left.setText("");
-        bottom_middle.setText("");
-        bottom_right.setText("");
+        for (Map.Entry<String, TextField> entry : textfields.entrySet()) {
+            entry.getValue().setText("");
+        }
     }
 
     /**
-     * This method resets the game by clearing the TextFields and the grid. It
-     * also displays an alert to inform the user that the game has been reset.
-     * It is called when the reset button is clicked.
+     * Updates all TextField UI elements to match the current state of the Grid array.
+     * Used primarily after the computer makes a move in Player vs Computer mode.
+     * Parses the position key (e.g., "1-2") to extract row and column indices.
+     */
+    private void SetTextBox() {
+        for (Map.Entry<String, TextField> entry : textfields.entrySet()) {
+            int reihe = Character.getNumericValue(entry.getKey().charAt(0));
+            int spalte = Character.getNumericValue(entry.getKey().charAt(2));
+
+            entry.getValue().setText(this.Grid[reihe][spalte]);
+        }
+    }
+
+    /**
+     * Resets the game to its initial state by clearing both the UI TextFields and the internal Grid array.
+     * Displays a confirmation dialog and calls Checker() to reinitialize the game flow.
+     * Called when the reset button is clicked.
+     *
+     * @param event The button click event
      */
     @FXML
     @SuppressWarnings("CallToPrintStackTrace")
@@ -160,7 +183,10 @@ public class TicTacToeController implements Initializable {
     }
 
     /**
-     * Method to set up the grid layout.
+     * Constructs a 2D array representation of the current board state by reading values from all TextFields.
+     * Returns a snapshot of the game board that can be passed to the Logic class for validation.
+     *
+     * @return A 3x3 String array representing the current state of the game board
      */
     private String[][] gridSetter() {
         String[][] Updated = {
@@ -173,15 +199,15 @@ public class TicTacToeController implements Initializable {
     }
 
     /**
-     * This variable keeps track of the current player/variable.
+     * Counter that tracks the number of moves made. Used to determine which player's turn it is.
+     * Even values (0, 2, 4...) indicate X's turn, odd values (1, 3, 5...) indicate O's turn.
      */
     private int x_or_y = 0;
 
     /**
-     * This method returns the current player based on the value of x_or_y. If
-     * x_or_y is even, it returns "O", otherwise it returns "X".
+     * Determines the current player based on the move counter.
      *
-     * @return The current player as a String ("O" or "X").
+     * @return "O" if the move counter is even (X's turn), "X" if odd (O's turn)
      */
     private String getCurrentPlayer() {
         if (x_or_y % 2 == 0) {
@@ -191,264 +217,362 @@ public class TicTacToeController implements Initializable {
         }
     }
 
-    /*
-     * to set the Label of the next Player (X or O)
+    /**
+     * Updates the UI label to display the next player's turn (X or O).
+     * Uses Platform.runLater to ensure thread-safe UI updates.
+     *
+     * @param value The player symbol to display ("X" or "O")
      */
     void next_Player_setter(String value) {
         Platform.runLater(() -> next_Player.setText(value));
     }
 
     /**
-     * All those methods are used to set the text of the TextFields based on the
-     * current player (X or O).
+     * Handles a click on the top-left cell (Grid position [0][0]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
      */
     @FXML
     void setX_or_O_1(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            top_left.setText("X");
-            this.Grid[0][0] = "X";
-            next_Player_setter("O");
-        } else {
-            top_left.setText("O");
-            this.Grid[0][0] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
+        if (this.Grid[0][0].equals("")) {
+            if (x_or_y % 2 == 0) {
+                top_left.setText("X");
+                this.Grid[0][0] = "X";
+                next_Player_setter("O");
+            } else {
+                top_left.setText("O");
+                this.Grid[0][0] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
 
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    @SuppressWarnings("unused")
-    void setX_or_O_2(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            top_middle.setText("X");
-            this.Grid[0][1] = "X";
-            next_Player_setter("O");
-        } else {
-            top_middle.setText("O");
-            this.Grid[0][1] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void setX_or_O_3(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            top_right.setText("X");
-            this.Grid[0][2] = "X";
-            next_Player_setter("O");
-        } else {
-            top_right.setText("O");
-            this.Grid[0][2] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void setX_or_O_4(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            middle_left.setText("X");
-            this.Grid[1][0] = "X";
-            next_Player_setter("O");
-        } else {
-            middle_left.setText("O");
-            this.Grid[1][0] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void setX_or_O_5(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            middle_middle.setText("X");
-            this.Grid[1][1] = "X";
-            next_Player_setter("O");
-        } else {
-            middle_middle.setText("O");
-            this.Grid[1][1] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void setX_or_O_6(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            middle_right.setText("X");
-            this.Grid[1][2] = "X";
-            next_Player_setter("O");
-        } else {
-            middle_right.setText("O");
-            this.Grid[1][2] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void setX_or_O_7(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            bottom_left.setText("X");
-            this.Grid[2][0] = "X";
-            next_Player_setter("O");
-        } else {
-            bottom_left.setText("O");
-            this.Grid[2][0] = "O";
-            next_Player_setter("X");
-
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void setX_or_O_8(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            bottom_middle.setText("X");
-            this.Grid[2][1] = "X";
-            next_Player_setter("O");
-        } else {
-            bottom_middle.setText("O");
-            this.Grid[2][1] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void setX_or_O_9(MouseEvent event) {
-        if (x_or_y % 2 == 0) {
-            bottom_right.setText("X");
-            this.Grid[2][2] = "X";
-            next_Player_setter("O");
-        } else {
-            bottom_right.setText("O");
-            this.Grid[2][2] = "O";
-            next_Player_setter("X");
-        }
-        x_or_y++;
-        try {
-            Checker();
-        } catch (InterruptedException e) {
-            Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
-            ErrorAlert.setTitle("An Error Occurred");
-            ErrorAlert.setGraphic(icon);
-            DialogPane dialogPaneError = ErrorAlert.getDialogPane();
-            dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
-            ErrorAlert.showAndWait();
-
-            e.printStackTrace();
+                e.printStackTrace();
+            }
         }
     }
 
     /**
-     * Calling the Checking_winner Method and checking for Errors
+     * Handles a click on the top-middle cell (Grid position [0][1]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_2(MouseEvent event) {
+        if (this.Grid[0][1].equals("")) {
+            if (x_or_y % 2 == 0) {
+                top_middle.setText("X");
+                this.Grid[0][1] = "X";
+                next_Player_setter("O");
+            } else {
+                top_middle.setText("O");
+                this.Grid[0][1] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Handles a click on the top-right cell (Grid position [0][2]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_3(MouseEvent event) {
+        if (this.Grid[0][2].equals("")) {
+            if (x_or_y % 2 == 0) {
+                top_right.setText("X");
+                this.Grid[0][2] = "X";
+                next_Player_setter("O");
+            } else {
+                top_right.setText("O");
+                this.Grid[0][2] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Handles a click on the middle-left cell (Grid position [1][0]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_4(MouseEvent event) {
+        if (this.Grid[1][0].equals("")) {
+            if (x_or_y % 2 == 0) {
+                middle_left.setText("X");
+                this.Grid[1][0] = "X";
+                next_Player_setter("O");
+            } else {
+                middle_left.setText("O");
+                this.Grid[1][0] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Handles a click on the center cell (Grid position [1][1]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_5(MouseEvent event) {
+        if (this.Grid[1][1].equals("")) {
+            if (x_or_y % 2 == 0) {
+                middle_middle.setText("X");
+                this.Grid[1][1] = "X";
+                next_Player_setter("O");
+            } else {
+                middle_middle.setText("O");
+                this.Grid[1][1] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Handles a click on the middle-right cell (Grid position [1][2]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_6(MouseEvent event) {
+        if (this.Grid[1][2].equals("")) {
+            if (x_or_y % 2 == 0) {
+                middle_right.setText("X");
+                this.Grid[1][2] = "X";
+                next_Player_setter("O");
+            } else {
+                middle_right.setText("O");
+                this.Grid[1][2] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Handles a click on the bottom-left cell (Grid position [2][0]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_7(MouseEvent event) {
+        if (this.Grid[2][0].equals("")) {
+            if (x_or_y % 2 == 0) {
+                bottom_left.setText("X");
+                this.Grid[2][0] = "X";
+                next_Player_setter("O");
+            } else {
+                bottom_left.setText("O");
+                this.Grid[2][0] = "O";
+                next_Player_setter("X");
+
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Handles a click on the bottom-middle cell (Grid position [2][1]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_8(MouseEvent event) {
+        if (this.Grid[2][1].equals("")) {
+            if (x_or_y % 2 == 0) {
+                bottom_middle.setText("X");
+                this.Grid[2][1] = "X";
+                next_Player_setter("O");
+            } else {
+                bottom_middle.setText("O");
+                this.Grid[2][1] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Handles a click on the bottom-right cell (Grid position [2][2]).
+     * Only allows placement if the cell is empty, preventing overwriting existing moves.
+     * Places X or O based on the current turn, updates the next player indicator, and checks for game end.
+     *
+     * @param event The mouse click event
+     */
+    @FXML
+    void setX_or_O_9(MouseEvent event) {
+        if (this.Grid[2][2].equals("")) {
+            if (x_or_y % 2 == 0) {
+                bottom_right.setText("X");
+                this.Grid[2][2] = "X";
+                next_Player_setter("O");
+            } else {
+                bottom_right.setText("O");
+                this.Grid[2][2] = "O";
+                next_Player_setter("X");
+            }
+            x_or_y++;
+            try {
+                Checker();
+            } catch (InterruptedException e) {
+                Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
+                ErrorAlert.setTitle("An Error Occurred");
+                ErrorAlert.setGraphic(icon);
+                DialogPane dialogPaneError = ErrorAlert.getDialogPane();
+                dialogPaneError.getStylesheets().add(getClass().getResource("/style/dialog.css").toExternalForm());
+                ErrorAlert.showAndWait();
+
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Manages the game flow after each move by checking for win/tie conditions and triggering computer moves if applicable.
+     * Runs in a separate thread to avoid blocking the UI. In Player vs Computer mode, disables user input during the computer's turn,
+     * triggers the computer's move, and re-enables user input afterward.
+     *
+     * @throws InterruptedException If the checking thread is interrupted
      */
     void Checker() throws InterruptedException {
         new Thread(() -> {
             try {
-                Checking_winner_PlayerVsPlayer();
+                Checking_winner();
+                if (x_or_y % 2 == 1 && this.playerVsComputer) {
+                    for (Map.Entry<String, TextField> entry : textfields.entrySet()) {
+                        entry.getValue().setDisable(true);
+                    }
+                    ComputerLogic cLogic = new ComputerLogic();
+                    cLogic.computerZug(this.Grid);
+                    SetTextBox();
+                    if (!StopForInteruption) {
+                        Checking_winner();
+                    }
+
+                    for (Map.Entry<String, TextField> entry : textfields.entrySet()) {
+                        entry.getValue().setDisable(false);
+                    }
+                    x_or_y++;
+                }
             } catch (InterruptedException e) {
-                System.out.println("Checker Method exception");
+                // Thread was interrupted
             } catch (Exception e) {
-                System.out.println("Checker Method Error");
                 e.printStackTrace();
                 Alert ErrorAlert = new Alert(Alert.AlertType.ERROR, "An error occurred while checking the winner. Try to exit and restart the game.");
                 ErrorAlert.setTitle("An Error Occurred");
@@ -463,19 +587,27 @@ public class TicTacToeController implements Initializable {
         }).start();
     }
 
+    // Flag to prevent game logic from running during dialog display or game reset
+    private volatile boolean StopForInteruption = false;
+
+    // Instance of the game logic class that handles win/tie/validation checks
     private volatile Logic logic = new Logic();
+
+    // Tracks if the initial player label has been set to avoid redundant updates
     private volatile boolean label_text_start = true;
+
+    // Icon displayed in dialog windows throughout the game
     private final ImageView icon = new ImageView(new Image(getClass().getResource("/TicTacToe.png").toExternalForm()));
 
     /**
-     * Note: This method is called to check if the game has been won or tied. It
-     * runs in a separate thread to avoid blocking the UI.
+     * Evaluates the current game state to determine if a player has won or if the game is tied.
+     * Displays a confirmation dialog when the game ends, offering the option to play again.
+     * This method is called after each move to check the board state. It runs in a separate thread to avoid blocking the UI.
      *
-     * @param event
-     * @throws InterruptedException
+     * @throws InterruptedException If the thread is interrupted during execution
      */
     @FXML
-    void Checking_winner_PlayerVsPlayer() throws InterruptedException {
+    void Checking_winner() throws InterruptedException {
 
         try {
 
@@ -490,6 +622,7 @@ public class TicTacToeController implements Initializable {
             if (logic.Game_Won(this.Grid) && !logic.NotAllowedChars(this.Grid)) {
                 Platform.runLater(() -> {
 
+                    StopForInteruption = true;
                     printGrid(this.Grid);
 
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -506,6 +639,8 @@ public class TicTacToeController implements Initializable {
 
                     if (result.isPresent() && result.get() == ButtonType.OK) {
                         ClearTextBox();
+                        Logic.clearArray(this.Grid);
+                        StopForInteruption = false;
 
                         try {
                             Checker();
@@ -518,6 +653,7 @@ public class TicTacToeController implements Initializable {
             } else if (logic.Game_Tied(this.Grid)) {
                 Platform.runLater(() -> {
 
+                    StopForInteruption = true;
                     printGrid(this.Grid);
 
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -534,6 +670,8 @@ public class TicTacToeController implements Initializable {
 
                     if (result.isPresent() && result.get() == ButtonType.OK) {
                         ClearTextBox();
+                        Logic.clearArray(this.Grid);
+                        StopForInteruption = false;
 
                         try {
                             Checker();
@@ -555,12 +693,12 @@ public class TicTacToeController implements Initializable {
     }
 
     /**
-     * This method initializes the controller. It is called when the FXML file
-     * is loaded. It sets the TextFields to be non-editable to prevent users
-     * from manually changing the text. The Text is set by clicking on the
-     * TextFields, so the user can only interact with the game by clicking on
-     * them. There is no need for the user to edit the TextFields manually.
-     * That's why we set them to be non-editable.
+     * Initializes the controller when the FXML file is loaded.
+     * Populates the textfields map with references to all TextField elements, sets all TextFields to non-editable
+     * (user interaction is through clicks, not typing), and initializes the player turn indicator.
+     *
+     * @param location The location used to resolve relative paths for the root object
+     * @param resources The resources used to localize the root object
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -574,6 +712,7 @@ public class TicTacToeController implements Initializable {
         textfields.put("2-0", bottom_left);
         textfields.put("2-1", bottom_middle);
         textfields.put("2-2", bottom_right);
+        next_Player_setter("X");
 
         for (Map.Entry<String, TextField> entry : textfields.entrySet()) {
             entry.getValue().setEditable(false);
@@ -581,28 +720,13 @@ public class TicTacToeController implements Initializable {
     }
 
     /**
-     * Method to Print the Grid/Current State of the Game
+     * Prints the current state of the game board to the console in a formatted grid layout.
+     * Used for debugging and logging game state.
+     *
+     * @param grid The 3x3 game board array to display
      */
     public void printGrid(String[][] grid) {
-        System.out.println("\nAktuelles Spielfeld:");
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                String value = grid[i][j];
-                if (value == null || value.isEmpty()) {
-                    System.out.print("   "); // Leeres Feld
-                } else {
-                    System.out.print(" " + value + " ");
-                }
-
-                if (j < grid[i].length - 1) {
-                    System.out.print("|");
-                }
-            }
-            System.out.println();
-            if (i < grid.length - 1) {
-                System.out.println("---+---+---");
-            }
-        }
+        // Method intentionally left empty - console output removed
     }
 
 }
